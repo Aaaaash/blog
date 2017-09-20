@@ -7,7 +7,8 @@
 
 #### withState
 ```javascript
-const enhance = withState('counter', 'setCounter', 0)
+// 接收三个参数，第一个参数为注入state的key名，第二个参数为修改state的函数名，第三个参数为默认值
+const enhance = withState('counter', 'setCounter', 0);
 const Counter = enhance(({ counter, setCounter }) =>
   <div>
     Count: {counter}
@@ -40,7 +41,7 @@ func2 = (component) => finalComponent;
 
 func0(func1(func2(Component)));
 ```
-如果直接看recompose的源代码实现会发现，很多方法比如`withState`、`withProps`、`withHandles`、`withContext`都是直接返回一个高阶组建的，他们都长这样
+直接看recompose的源代码实现会发现很多方法比如`withState`、`withProps`、`withHandles`、`withContext`都是直接返回一个高阶组件的，他们都长这样
 
 ```javascript
 const withXXX = (...args) => (BaseComponent) => {
@@ -83,3 +84,64 @@ export default compose(
   })),
 )(Toggle);
 ```
+
+#### 生命周期函数
+
+recompose推崇函数式无状态组件，因为这样既方便书写也可以把无用的逻辑抽离出来，使用`lifecycle`函数可以为无状态组件添加生命周期函数
+```javascript
+import { lifecycle } from 'recompose';
+
+const cycle = {
+  componentDidMount() {
+    // didMount
+  },
+  componentWillReceiveProps(nextProps) {
+    // nextProps
+  },
+  componentWillUnmount() {
+    // willUnmount
+  }
+};
+
+const Toggle = (props) => <div>{props.value}</div>;
+
+export default lifecycle(cycle)(Toggle);
+```
+
+#### nest组件层级嵌套
+`nest`函数的作用是将传入的组件按照顺序一层一层嵌套起来,形成这样的jsx结构
+```javascript
+<A>
+  <B>
+    <C>
+      {/*xxx*/}
+    </C>
+  </B>
+</A>
+```
+使用nest可以将这些组件自动嵌套在一起
+```javascript
+import { nest } from 'recompose';
+
+const A = ({data, children}) => (
+  <div>
+    this is some node
+    {children}
+  </div>
+);
+const B = ({data, children}) => (
+  <div>
+    this is some node
+    {children}
+  </div>
+);
+const C = ({data, children}) => (
+  <div>
+    this is some node
+    {children}
+  </div>
+);
+export default nest(A, B, C);
+```
+
+需要注意的是组件传入的顺序决定嵌套层级，以及父组件需要使用{children}引用子组件
