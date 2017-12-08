@@ -367,7 +367,7 @@ export default Container.createFunctional(App, getStore, getState);
 后续会补充flux官方实现的源码解析
 ### Redux
 [Redux](https://github.com/reactjs/redux)是由[Dan Abramov](https://github.com/gaearon)对Flux架构的另一种实现，它延续了flux架构中`views`、`store`、`dispatch`的思想，并在这个基础上对其进行完善，将原本store中的reduce函数拆分为`reducer`，并将多个stores合并为一个store，使其更利于测试
-![redux](https://camo.githubusercontent.com/00d69e3fde816e17eea2bbadf359c30040f51398/687474703a2f2f7777772e7468656f646f2e66722f75706c6f6164732f626c6f672f2f323031362f30332f75695f776f726b666c6f772e706e67)
+![redux](https://camo.githubusercontent.com/c24115bb93ccefa396aee0be23f06daa3776105a/687474703a2f2f7777772e6265626574746572646576656c6f7065722e636f6d2f696d672f706f73745f696d672f7272652d322e706e67)
 [The Evolution of Flux Frameworks这篇文章](https://medium.com/@dan_abramov/the-evolution-of-flux-frameworks-6c16ad26bb31)，是他对原Flux架构的看法以及他的改进
 >The first change is to have the action creators return the dispatched action.What looked like this:
 ```javascript
