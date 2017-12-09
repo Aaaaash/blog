@@ -1,4 +1,4 @@
-## 利用Reselect+ImmutableJS实现Pure-Render
+## 利用ImmutableJS实现Pure-Render
 `PureRender`是react应用中最常见的优化方式之一，顾名思义是纯·渲染，React的核心思想可以用一个表达式来概括
 
 `view = f(model)`
@@ -27,14 +27,88 @@ class MyPage extends PureComponent {
 答案是[ImmutableData](https://github.com/facebook/immutable-js)
 ### 什么是ImmutableData？
 > ImmutableData（不可变数据）就是指一旦创建就不能被改变的数据
+上对ImmutableData的任何修改都会返回一个新的immutable对象
 
-Immutablejs实现了List、Map、Set等常用数据类型，分别对应js中的数组和对象
+Immutablejs实现了List、Map等常用数据类型，分别对应js中的数组和对象
+
+简单来说，当对一个immutabledata进行增删改操作时，并不会修改原本的数据，而是生成了新的immutable对象，如果没有任何修改则返回原对象
 
 基本用法可参考[官方文档](http://facebook.github.io/immutable-js/)
 ### React中怎么用？
 可以将组件state中的数据转为immutabledata，也可以将redux的state转为immutabledata
+```javascript
+// state
+import React from 'react';
+import { fromJS } from 'immutable';
 
-> 未完
+class Dmoe extends PureComponent {
+  state = {
+    someDeepData: fromJS({
+      name: 'misaka',
+      age: 20,
+    }),
+  }
+
+  handleChangeAge = () => {
+    const { someDeepData } = this.state;
+    const prevAge = someDeepData.get('age');
+    this.setState({
+      someDeepData: someDeepData.set('age', prevAge - 1),
+    });
+  }
+
+  render() {
+    const { someDeepData } = this.state;
+    return (<div>
+      <h1>{someDeepData.get('name')}</h1>
+      <button onClick={this.handleChangeAge}>-1s</button>
+    </div>);
+  }
+}
+```
+[CodeSandbox在线示例](https://codesandbox.io/s/3rq3orqom6)
+
+例如一个父子组件嵌套，父组件数据改变导致自身rerender从而引发子组件一起rerender，这种情况使用ImmutableData + PureComponent则可以很好的避免子组件的重复渲染
+```javascript
+
+class Child extends PureComponent {
+  const { info } = this.props;
+  render() {
+    return (<div>
+      <h1>my name is {info.get('name')}</h1>
+      <p>i'm {info.get('age')} years old!</p>
+    </div>)
+  }
+}
+
+
+class Parent extends PureComponent {
+  state = {
+    info: fromJS({
+      name: 'misaka',
+      age: 10,
+    }),
+    age: 20,
+  }
+
+  handleChangeAge = () => {
+    const { age } = this.state;
+   this.setState({
+     age: age + 1,
+   });
+  }
+  render() {
+    const { info, age } = this.props;
+    <div>
+      I'm Sakura, {age} years old. this is my child! 
+      <Child />
+      <button onClick={this.handleChangeAge}>+1s</button>
+    </div>
+  }
+}
+```
+
+[CodeSanBox在线示例](https://codesandbox.io/s/n9z3z2k0op)
 
 ### refs:
 * [Master the JavaScript Interview: What is a Pure Function?](https://medium.com/javascript-scene/master-the-javascript-interview-what-is-a-pure-function-d1c076bec976)
