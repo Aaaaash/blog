@@ -70,42 +70,46 @@ class Dmoe extends PureComponent {
 
 例如一个父子组件嵌套，父组件数据改变导致自身rerender从而引发子组件一起rerender，这种情况使用ImmutableData + PureComponent则可以很好的避免子组件的重复渲染
 ```javascript
-
 class Child extends PureComponent {
-  const { info } = this.props;
   render() {
-    return (<div>
-      <h1>my name is {info.get('name')}</h1>
-      <p>i'm {info.get('age')} years old!</p>
-    </div>)
+    const { info } = this.props;
+    console.log("render");
+    return (
+      <div>
+        <h1>my name is {info.name}</h1>
+        <p>i'm {info.age} years old!</p>
+      </div>
+    );
   }
 }
-
 
 class Parent extends PureComponent {
   state = {
     info: fromJS({
-      name: 'misaka',
-      age: 10,
+      name: "misaka",
+      age: 10
     }),
-    age: 20,
-  }
+    age: 20
+  };
 
   handleChangeAge = () => {
     const { age } = this.state;
-   this.setState({
-     age: age + 1,
-   });
-  }
+    this.setState({
+      age: age + 1
+    });
+  };
   render() {
-    const { info, age } = this.props;
-    <div>
-      I'm Sakura, {age} years old. this is my child! 
-      <Child />
-      <button onClick={this.handleChangeAge}>+1s</button>
-    </div>
+    const { info, age } = this.state;
+    return (
+      <div>
+        <Child info={info} />
+        I'm Sakura, {age} years old. this is my child!
+        <button onClick={this.handleChangeAge}>+1s</button>
+      </div>
+    );
   }
 }
+
 ```
 
 [CodeSanBox在线示例](https://codesandbox.io/s/n9z3z2k0op)
