@@ -9,3 +9,5 @@
 2017-09-19：[Recompose,用于创建高阶组件的React辅助库](https://github.com/SakuraAsh/blog/issues/4)
 
 2017-09-26：[React技术栈不完全总结](https://github.com/SakuraAsh/blog/issues/5)
+
+2017-12-09: [利用PureComponent+ImmutableJS实现Pure-render](https://github.com/SakuraAsh/blog/issues/6)
