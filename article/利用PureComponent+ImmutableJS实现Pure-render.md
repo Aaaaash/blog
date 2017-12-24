@@ -77,7 +77,7 @@ class Child extends PureComponent {
     return (
       <div>
         <h1>my name is {info.name}</h1>
-        <p>i'm {info.age} years old!</p>
+        <p>I am {info.age} years old!</p>
       </div>
     );
   }
@@ -103,7 +103,7 @@ class Parent extends PureComponent {
     return (
       <div>
         <Child info={info} />
-        I'm Sakura, {age} years old. this is my child!
+        I am Sakura, {age} years old. this is my child!
         <button onClick={this.handleChangeAge}>+1s</button>
       </div>
     );
