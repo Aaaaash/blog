@@ -1,0 +1,1 @@
+{"dependencies":[],"generated":{"js":"\"use strict\";\nexports.__esModule = true;\nvar Node = /** @class */ (function () {\n    function Node(element, next) {\n        this.element = element;\n        this.next = next;\n    }\n    return Node;\n}());\nexports[\"default\"] = Node;\n"},"hash":"d51ea35f0b9d1737df95aad5e68a740e"}
