@@ -68,7 +68,7 @@ require = (function (modules, cache, entry) {
 
   // Override the current require with this new one
   return newRequire;
-})({5:[function(require,module,exports) {
+})({4:[function(require,module,exports) {
 "use strict";
 exports.__esModule = true;
 var Node = /** @class */ (function () {
@@ -83,11 +83,10 @@ var Node = /** @class */ (function () {
 }());
 exports["default"] = Node;
 
-},{}],6:[function(require,module,exports) {
+},{}],5:[function(require,module,exports) {
 "use strict";
 exports.__esModule = true;
 function insertNode(node, newNode) {
-    debugger;
     if (newNode.key < node.key) {
         if (node.left === null) {
             node.left = newNode;
@@ -107,11 +106,50 @@ function insertNode(node, newNode) {
 }
 exports["default"] = insertNode;
 
-},{}],4:[function(require,module,exports) {
+},{}],6:[function(require,module,exports) {
+"use strict";
+exports.__esModule = true;
+function inOrderTraverseNode(node, callback) {
+    if (node !== null) {
+        inOrderTraverseNode(node.left, callback);
+        callback(node.key);
+        inOrderTraverseNode(node.right, callback);
+    }
+}
+exports["default"] = inOrderTraverseNode;
+
+},{}],7:[function(require,module,exports) {
+"use strict";
+exports.__esModule = true;
+function preOrderTraverseNode(node, callback) {
+    if (node !== null) {
+        callback(node.key);
+        preOrderTraverseNode(node.left, callback);
+        preOrderTraverseNode(node.right, callback);
+    }
+}
+exports["default"] = preOrderTraverseNode;
+
+},{}],8:[function(require,module,exports) {
+"use strict";
+exports.__esModule = true;
+function postOrderTraverseNode(node, callback) {
+    if (node !== null) {
+        postOrderTraverseNode(node.left, callback);
+        postOrderTraverseNode(node.right, callback);
+        callback(node.key);
+    }
+}
+exports["default"] = postOrderTraverseNode;
+
+},{}],2:[function(require,module,exports) {
 "use strict";
 exports.__esModule = true;
 var Node_1 = require("./Node");
 var insertNode_1 = require("./insertNode");
+var inOrderTraverseNode_1 = require("./inOrderTraverseNode");
+var preOrderTraverseNode_1 = require("./preOrderTraverseNode");
+var postOrderTraverseNode_1 = require("./postOrderTraverseNode");
 var BinarySearchTree = /** @class */ (function () {
     function BinarySearchTree() {
         this.root = null;
@@ -125,6 +163,15 @@ var BinarySearchTree = /** @class */ (function () {
             insertNode_1["default"](this.root, node);
         }
     };
+    BinarySearchTree.prototype.inOrderTraverse = function (callback) {
+        inOrderTraverseNode_1["default"](this.root, callback);
+    };
+    BinarySearchTree.prototype.preOrderTraverse = function (callback) {
+        preOrderTraverseNode_1["default"](this.root, callback);
+    };
+    BinarySearchTree.prototype.postOrderTraverse = function (callback) {
+        postOrderTraverseNode_1["default"](this.root, callback);
+    };
     return BinarySearchTree;
 }());
 var tree = new BinarySearchTree();
@@ -132,9 +179,23 @@ tree.insert(10);
 tree.insert(23);
 tree.insert(27);
 tree.insert(1);
-console.log(tree);
+tree.insert(7);
+tree.insert(231);
+console.log('中序遍历');
+tree.inOrderTraverse(function (key) {
+    console.log(key);
+});
+console.log('先序遍历');
+tree.preOrderTraverse(function (key) {
+    console.log(key);
+});
+console.log('后序遍历');
+tree.postOrderTraverse(function (key) {
+    console.log(key);
+});
+// console.log(tree);
 
-},{"./Node":5,"./insertNode":6}],0:[function(require,module,exports) {
+},{"./Node":4,"./insertNode":5,"./inOrderTraverseNode":6,"./preOrderTraverseNode":7,"./postOrderTraverseNode":8}],0:[function(require,module,exports) {
 var global = (1, eval)('this');
 var OldModule = module.bundle.Module;
 function Module() {
@@ -152,7 +213,7 @@ function Module() {
 module.bundle.Module = Module;
 
 if (!module.bundle.parent && typeof WebSocket !== 'undefined') {
-  var ws = new WebSocket('ws://localhost:51580/');
+  var ws = new WebSocket('ws://localhost:60216/');
   ws.onmessage = function(event) {
     var data = JSON.parse(event.data);
 
@@ -253,4 +314,4 @@ function hmrAccept(bundle, id) {
     return hmrAccept(global.require, id)
   });
 }
-},{}]},{},[0,4])
+},{}]},{},[0,2])
