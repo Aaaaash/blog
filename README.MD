@@ -16,4 +16,4 @@
 
 2018-03-10: [数据结构之二叉树](https://github.com/SakuraAsh/blog/issues/9)
 
-2018-03-24: [面试题整理](https://github.com/SakuraAsh/blog/issues/10)
+2018-03-24: [面试题整理](https://github.com/SakuraAsh/blog/issues/7)
