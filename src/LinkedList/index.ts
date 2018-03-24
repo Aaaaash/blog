@@ -6,7 +6,7 @@ interface Element {
 
 class LinkedList {
   length: number;
-  head: Node;
+  head: Node<Element>;
   constructor() {
     this.length = 0;
     this.head = null;
