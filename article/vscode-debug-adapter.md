@@ -12,7 +12,7 @@
 
 ## 调试器协议详解
 
-任然以 Java 语言为例，在 VSCODE 中搜索并安装扩展 `Debugger for Java`, 重载编辑器后即可使用 Java 调试器。
+仍然以 Java 语言为例，在 VSCODE 中搜索并安装扩展 `Debugger for Java`, 重载编辑器后即可使用 Java 调试器。
 
 这里再简单介绍一下 Java 调试器的实现原理。
 
@@ -204,7 +204,7 @@ vm.setLaunchedProcess(process);
 
 同样的，由于平台差异，在 Web 端无法直接监听调试器端口来进行通信，我们还需要一层 WebSocket 来转发调试器与客户端的消息。
 
-具体来说，服务端需要启动一个 WebSocket 服务，当调试器启动 TCPServer 时，客户端携带调试端口连接到服务器，服务器再作为 TCPClient 连接到调试器，然后将客户端（网页端）的请求转发到给调试器服务。
+服务端需要启动一个 WebSocket 服务，当调试器启动 TCPServer 时，客户端携带调试端口连接到服务器，服务器再作为 TCPClient 连接到调试器，然后将客户端（网页端）的请求转发到给调试器服务。
 
 服务端实现非常简单，只需要在接收到客户端请求后按照协议规范拼接好带有 `Content-Length` 字段的协议字符串发送给提调试器。同样收到调试器回复或事件消息时再发送给客户端即可。
 
@@ -299,8 +299,8 @@ handleMessage = (data) => {
 
   switch (message.type) {
     case 'event':
-        this.onDapEvent(message);
-        break;
+      this.onDapEvent(message);
+      break;
   }
 }
 
