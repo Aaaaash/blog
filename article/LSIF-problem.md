@@ -13,7 +13,7 @@
 简单解释一下这里 background script 是指 Chrome 插件的一个背景页, 每个插件都可以有一个独立的后台脚本, 会随浏览器启动运行, 而 content script 是指可以访问当前页面的一段脚本, 准确来说 content script 可以和当前的页面共享 DOM, 但并不能访问页面上的 window 对象. 我的思路是, background 负责维护一个和 lsif-server 的 WebSocket 连接, content script 只负责当前页面的事件监听及 DOM 操作, 另外还有一个 popup script (也就是右上角插件点击后弹出的小框)负责显示 WebSocket 连接状态.
 
 content script 不直接和 lsif-server 通信, 所有消息都经过 background 转发, Chrome 插件支持在 content 和 background 之间维持一个长连接
-
+```ts
     // content script
     const messagePort = chrome.runtime.connect({ name: 'lsif-typescript-message-channel' });
     messagePort.postMessage({
@@ -28,13 +28,13 @@ content script 不直接和 lsif-server 通信, 所有消息都经过 background
     			}
     	}
     });
-
+```
 这种模式下, content 只需要维持和 background 之间的通信即可, 同时 background 还需要及时向 content 发送连接状态, 保证 content < - > background < - > lsif-server 消息同步.
 
 第二个优化源于一个想法, 先来回顾一下插件流程, 当打开一个 GitHub 代码页面, content 会检查 background 和 lsif-server 的连接状态, 然后依次发送 initialize, documentSymbol 等请求, 一旦切换到另一个页面(这里我用 [insight.io](http://insigh.io/) 插件的文件树功能切换代码页面), 会刷新页面并跳转到新的文件, 然后依然是上述流程, 这个过程没有太大问题. 但当我从 GitHub 项目主页点文件链接时发现页面并没有刷新, 而是直接请求了代码页面的数据并且渲染出来, 这时插件是没有工作的, 因为一开始进入页面 content 脚本只会检查一次 window.location, 非代码页面实际什么也不会发生, 而通过这种方式不刷新直接打开代码页时插件没有监听任何事件, 所以此时插件依然不会运行.
 
 解决方案自然是监听 url change 事件, 进入代码页面开始运行插件, 很遗憾虽然有相应的 API 直接修改 url(不是 hash), 但并没有监听这个操作的事件, 好在社区依然有很 hack 的方案, 也就是魔改 window.history.pushState
-
+```ts
     function nativeHistoryWrapper(eventType: string): () => ReturnType<typeof history['pushState']> {
         const origin = window.top.history[eventType];
         return function () {
@@ -53,18 +53,18 @@ content script 不直接和 lsif-server 通信, 所有消息都经过 background
     window.addEventListener('pushState', () => {
     	//...
     });
-
+```
 当调用 pushState 时会自动 dispatchEvent, 然后直接监听即可.
 
 看上去很完美, 直到我在 content 脚本里加入了这段代码, 从项目主页开始点击链接, 没有任何反应. 还记得之前说的吗, content 脚本和当前页面共享 DOM, 但并不能访问当前页面的 window 对象, 也就是这段代码修改了的 window.history 并不会在当前页面生效, 因为 content 脚本本身运行就不在当前页面上下文.
 
 当然解决办法也是有的, 常见的方式是 content 页面不做具体逻辑处理, 只负责在 document.body 里动态插入一个 script 标签, src 即是我们真正的 content 代码.
-
+```ts
     const script = document.createElement('script');
     script.src = chrome.runtime.getURL('out/content.js');
     script.type = 'text/javascript';
     document.body.appendChild(script);
-
+```
 但这样显然还不够, 因为之前 content 和 background 之间的长连接在content 被直接注入到页面后无法通信了, 而且因为这种行为本身就比较 hack , 所以并没有官方的通信方案. 不过我们还是可以借助强大的 postMessage.
 
 为了区分我们把注入的 content 脚本叫做 inject script, 被注入到页面真正的 content 叫做 injected script, 这两个脚本之间可以通过 postMessage 通信, 我们需要把之前 content 和 background的通信方式改为 inject < - > injected < - > background < - > lsif-server, 而 injected 可以看做一个代理 agent, 它和 inject 通过 postMessage 通信, 和 background 通过长连接通信, inject 通过 window.postMessage 发送消息到 injected, injected 不需要做任何处理直接发送给 background, background 再发送到 lsif-server , 请求响应流程则是反过来.
