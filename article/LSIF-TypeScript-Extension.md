@@ -25,7 +25,7 @@
 ## 实现原理
 
 首先插件需要通过类似 LSP 的方式和一个 LSIF 后端通信, 这里借鉴了 LSP 的一部分方法, 初次打开 GitHub 项目会发送一个 initialize 请求告诉 LSIF 后端开始初始化, LSIF 后端会 clone 项目代码并使用 lsif-tsc 工具分析一遍项目代码, 然后将结果缓存在一个特定文件中, 索引结果大概长这样
-
+```json
     {"id":1,"type":"vertex","label":"metaData","version":"0.4.2","projectRoot":"file:///path/to/project"}
     {"id":2,"type":"vertex","label":"project","kind":"typescript"}
     {"id":3,"type":"vertex","label":"$event","kind":"begin","scope":"project","data":2}
@@ -62,13 +62,12 @@
     {"id":34,"type":"edge","label":"next","outV":33,"inV":13}
     {"id":35,"type":"vertex","label":"resultSet"}
     {"id":36,"type":"vertex","label":"moniker","kind":"export","scheme":"tsc","identifier":"out/common/file:GitChangeType"}
+```
 
 这个过程一般不会很久(除非是超大项目), 例如 [vscode-languageserver-node](https://github.com/microsoft/vscode-languageserver-node) 这个项目大概需要 20s 以内的时间, 最终会生成 24m 的索引文件, 然后将这个文件逐行读取并构造出一个图(来不及解释了, 这段代码是我抄的), 可以以很快的速度查询 hover/references 等数据. 之后会返回 initialized 表示初始化完毕, 这时候就可以发起像 LSP 一样的请求了.
 
 我的第一个需求是显示一个类似 VS Code 大纲视图的列表, 方便我在读超长的代码时快速跳转到文件内相应的位置, 只需要发送 documentSymbol 请求, 在后端会去之前构造的图里找到对应文件的 documentSymbol 结果并返回给客户端(这里的客户端就是我们的 Chrome 插件). documentSymbol 的结构长这样
-
- 
-
+```json
     {
       "result": [
         {
@@ -101,7 +100,7 @@
       "id": 2,
       "method": "documentSymbol"
     }
-
+```
 可以看到相应是一个数组, 包含了文件中所有 definition 的名称, kind(表示他是啥)以及位置信息(zero base).
 
 拿到这些就可以在 GitHub 代码页面展示出来了, 大概就是每个 item 放一个 a 标签, 指向对应的行
