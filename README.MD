@@ -28,8 +28,9 @@
 2018-08-12：[VSCODE 调试器实现原理及实现在线编辑器的调试功能](https://github.com/Aaaaash/blog/issues/13)
 
 ### LSIF
-2019-08-04: [LSIF TypeScript Extenion](https://github.com/Aaaaash/blog/issues/16)
+2019-07: [LSIF TypeScript Extenion](https://github.com/Aaaaash/blog/issues/16)
 
+2019-07: [LSIF 插件的一些问题](https://github.com/Aaaaash/blog/issues/17)
 ### VS Code
 
 2019-01: [VSCode 插件运行机制](https://github.com/Aaaaash/blog/issues/14)
